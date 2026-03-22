@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { calculateDriverNumber, calculateConductorNumber, calculateSDT } from '../utils/helpers';
+import { calculateDriverNumber, calculateConductorNumber, calculateSDT, getLoShuGridAnalysis } from '../utils/helpers';
 import { useAnalysisEngine } from './useAnalysisEngine';
-import { getLoShuGridAnalysis } from '../utils/helpers';
 
 const DISFAVORED_NUMBERS = ['0', '2', '4', '7', '8'];
 
@@ -18,7 +17,6 @@ export const useNumberGenerationEngine = () => {
         const conductor = calculateConductorNumber(dob);
         const { fixedDigits, sdt, last4sdt } = criteria;
 
-        // UPDATED FUNCTION CALL: Get missing numbers from the complete Lo Shu grid
         const { missing: missingNumbers } = getLoShuGridAnalysis(dob, driver, conductor);
         const missingNumbersAsStrings = missingNumbers.map(n => String(n));
 
@@ -27,11 +25,11 @@ export const useNumberGenerationEngine = () => {
             const template = fixedDigits.map(d => d === '' ? null : d);
             const emptyIndices = template.map((d, i) => d === null ? i : -1).filter(i => i !== -1);
             
-            const maxAttempts = 50000;
+            const maxAttempts = 100000;
             let attempts = 0;
             const uniqueNumbers = new Set();
 
-            while (attempts < maxAttempts && results.length < 200) {
+            while (attempts < maxAttempts && results.length < 500) {
                 let newNumberArr = [...template];
                 emptyIndices.forEach(i => {
                     const shouldUseMissing = Math.random() < 0.7 && missingNumbersAsStrings.length > 0;
@@ -64,5 +62,5 @@ export const useNumberGenerationEngine = () => {
         }, 500);
     };
 
-    return { generatedNumbers, isGenerating, generationEngine };
+    return { generatedNumbers, setGeneratedNumbers, isGenerating, generationEngine };
 };

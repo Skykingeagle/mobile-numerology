@@ -13,17 +13,14 @@ function App() {
   const [analysisResult, setAnalysisResult] = useState(null);
   
   const { analysisEngine, isAnalyzing } = useAnalysisEngine();
-  const { generatedNumbers, isGenerating, generationEngine } = useNumberGenerationEngine();
+  const { generatedNumbers, setGeneratedNumbers, isGenerating, generationEngine } = useNumberGenerationEngine();
 
   const handleAnalysis = (data) => {
-    setUserInput(data); // Always store the user's core details
-
-    // Only run the analysis engine if a valid mobile number was provided
+    setUserInput(data);
     if (data.mobileNumber && data.mobileNumber.length === 10) {
       const result = analysisEngine(data.mobileNumber, data.dob);
       setAnalysisResult(result);
     } else {
-      // If no number is submitted, clear any previous analysis report
       setAnalysisResult(null);
     }
   };
@@ -36,13 +33,20 @@ function App() {
     }
   };
 
+  const handleReset = () => {
+      setUserInput(null);
+      setAnalysisResult(null);
+      setGeneratedNumbers([]);
+      window.scrollTo(0, 0);
+  };
+
   return (
     <>
       <CssBaseline />
-      <Header />
+      <Header className="no-print" />
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Grid container spacing={3}>
-          <Grid item xs={12} md={5}>
+          <Grid item xs={12} md={5} className="no-print">
             <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
               <Typography variant="h6" color="primary" gutterBottom>
                 Phase 1: Enter Your Details
@@ -50,11 +54,16 @@ function App() {
               <UserInputForm onSubmit={handleAnalysis} loading={isAnalyzing} />
             </Paper>
           </Grid>
+          
           <Grid item xs={12} md={7}>
-            <AnalysisReport result={analysisResult} />
+            <div id="print-area">
+                <AnalysisReport result={analysisResult} handleReset={handleReset} />
+            </div>
           </Grid>
-          <Grid item xs={12}><Divider sx={{ my: 2 }} /></Grid>
-          <Grid item xs={12}>
+
+          <Grid item xs={12} className="no-print"><Divider sx={{ my: 2 }} /></Grid>
+          
+          <Grid item xs={12} className="no-print">
             <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                <Typography variant="h6" color="primary" gutterBottom>
                 Phase 2: Generate a New Number
@@ -62,7 +71,8 @@ function App() {
               <NumberGeneratorForm onGenerate={handleGeneration} loading={isGenerating} />
             </Paper>
           </Grid>
-          <Grid item xs={12}>
+          
+          <Grid item xs={12} className="no-print">
             <GeneratedNumbersList numbers={generatedNumbers} loading={isGenerating} />
           </Grid>
         </Grid>

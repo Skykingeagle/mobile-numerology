@@ -10,23 +10,56 @@ export const driverConductorInterpretations = {
   9: "Represents compassion, humanitarianism, and completion. You are a selfless idealist with a desire to make the world a better place."
 };
 
+const loShuDetails = {
+  1: { present: "Presence of 1 gives strong willpower, determination, and leadership potential.", missing: "Missing 1 suggests challenges with self-confidence and expressing individuality. You may feel dependent on others.", repeat: "Too many 1s can lead to arrogance, stubbornness, and a 'my way or the highway' attitude." },
+  2: { present: "Presence of 2 indicates high intuition, sensitivity, and diplomatic skills.", missing: "Missing 2 can cause a lack of tact and sensitivity. You might struggle to understand others' feelings.", repeat: "Too many 2s can result in being over-emotional, dependent, and unable to make decisions." },
+  3: { present: "Presence of 3 grants creativity, a sharp mind, and excellent communication skills.", missing: "Missing 3 points to difficulty in self-expression and a lack of imagination. You may feel mentally blocked.", repeat: "Too many 3s can create scattered energy, boastfulness, and a tendency to be superficial." },
+  4: { present: "Presence of 4 provides practicality, patience, and organizational skills.", missing: "Missing 4 leads to disorganization, a lack of planning, and instability in life.", repeat: "Too many 4s can make one overly materialistic, rigid, and stuck in routines, fearing change." },
+  5: { present: "Presence of 5 brings adaptability, freedom, and good communication.", missing: "Missing 5 indicates a lack of motivation, versatility, and an inability to embrace change.", repeat: "Too many 5s can cause restlessness, irresponsibility, and a tendency towards addiction." },
+  6: { present: "Presence of 6 signifies a love for family, a sense of responsibility, and domestic harmony.", missing: "Missing 6 suggests challenges in relationships and family life. You may shy away from responsibilities.", repeat: "Too many 6s can lead to anxiety, extreme possessiveness, and meddling in others' affairs." },
+  7: { present: "Presence of 7 indicates a spiritual, analytical, and truth-seeking nature.", missing: "Missing 7 points to a lack of faith and an inability to look inwards, leading to a disorganized personal life.", repeat: "Too many 7s can result in isolation, depression, and losses through deception or health issues." },
+  8: { present: "Presence of 8 grants ambition, financial wisdom, and executive skills.", missing: "Missing 8 creates financial carelessness and a lack of judgment in money matters, leading to obstacles.", repeat: "Too many 8s can make one overly ambitious, domineering, and willing to achieve goals by any means." },
+  9: { present: "Presence of 9 represents humanitarianism, compassion, and idealism.", missing: "Missing 9 indicates a lack of compassion and a selfish nature. You may struggle to see the bigger picture.", repeat: "Too many 9s can lead to impatience, aggression, and feeling emotionally drained by the world's problems." },
+};
+
 export const getLoShuInterpretation = (missing, repeating, driver, conductor) => {
     let text = [];
-    if (missing.length === 0) {
-        text.push("Your Lo Shu grid is complete, indicating a well-rounded personality with balanced energies from birth.");
-    } else {
-        missing.forEach(num => {
-            if (num == driver) text.push(`Missing your Driver Number (${driver}) is a significant challenge, indicating a lifelong lesson in mastering your core identity.`);
-            if (num == conductor) text.push(`Missing your Conductor Number (${conductor}) suggests you may struggle to align with your life's ultimate path and purpose.`);
-            // Add more specific interpretations if needed
+    
+    // Analyze Present Numbers
+    const present = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(n => !missing.includes(String(n)));
+    if (present.length > 0) {
+        text.push("STRENGTHS (Present Numbers):");
+        present.forEach(num => {
+            if (repeating.find(r => r.num == num)) return; // Skip if it's a repeating number
+            text.push(`- Number ${num}: ${loShuDetails[num].present}`);
         });
     }
+
+    // Analyze Repeating Numbers
     if (repeating.length > 0) {
+        text.push("\nINTENSE ENERGIES (Repeating Numbers):");
         repeating.forEach(item => {
-            if (item.num == driver) text.push(`The repetition of your Driver Number (${driver}) amplifies your core traits but may cause them to become excessive.`);
+            text.push(`- Number ${item.num} (appears ${item.count} times): ${loShuDetails[item.num].repeat}`);
         });
     }
-    return text.length > 0 ? text.join(' ') : "Your birth numbers show a balanced energy profile.";
+
+    // Analyze Missing Numbers
+    if (missing.length > 0) {
+        text.push("\nAREAS FOR DEVELOPMENT (Missing Numbers):");
+        missing.forEach(num => {
+            text.push(`- Number ${num}: ${loShuDetails[num].missing}`);
+        });
+    }
+    
+    // Driver/Conductor Context
+    if (missing.includes(String(driver))) {
+       text.push(`\nCRITICAL NOTE: The absence of your Driver Number (${driver}) is a major life lesson, indicating a need to consciously develop your core identity and self-confidence.`);
+    }
+     if (missing.includes(String(conductor))) {
+       text.push(`\nCRITICAL NOTE: Missing your Conductor Number (${conductor}) suggests a potential struggle to find and align with your life's ultimate purpose.`);
+    }
+
+    return text.join('\n');
 };
 
 export const placementInterpretation = {
@@ -78,3 +111,4 @@ export const pairHarmonyRatingInterpretations = {
   N: "This is a 'Neutral' pair. It has a balanced and stable influence.",
   B: "This is a 'Bad' pair. This combination can create conflict or unfavorable energy. It's an area to be mindful of."
 };
+
